@@ -2,9 +2,9 @@ import time
 import pandas as pd
 import numpy as np
 
-CITY_DATA = {'chicago': 'chicago.csv',
-             'new york city': 'new_york_city.csv',
-             'washington': 'washington.csv'}
+CITY_DATA = { 'chicago': 'chicago.csv',
+              'new york city': 'new_york_city.csv',
+              'washington': 'washington.csv' }
 
 
 def get_filters():
@@ -19,27 +19,28 @@ def get_filters():
     print('Hello! Let\'s explore some US bikeshare data!')
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
     cities = ['chicago','new york city','washington']
-    city = str(input("please enter your requested city : ")).lower().strip()
+    city = str(input("please enter your requested city :")).lower().strip()
 
     while(city not in cities):
-        city = str(input("please enter 'chicago','new york city' or'washington' : ")).lower().strip()
+        city = str(input("please enter 'chicago','new york city' or'washington' :")).lower().strip()
 
     # get user input for month (all, january, february, ... , june)
     months = ["all", "january", "february", "march","april","may", "june"]
-    month = str(input("please enter desired month or all : ")).lower().strip()
+    month = str(input("please enter desired month or all :")).lower().strip()
 
     while(month not in months):
-        month = str(input("please enter a month from january to june : ")).strip().lower()
+        month = str(input("please enter a month from january to june or all for no filters :")).strip().lower()
 
     # get user input for day of week (all, monday, tuesday, ... sunday)
     days = ["all", "monday", "tuesday","wednesday","thursday","friday","saturday" , "sunday"]
-    day = str(input("please enter desired day or all : ")).lower().strip()
+    day = str(input("please enter desired day or all for no filters :")).lower().strip()
 
     while(day not in days):
-        day = str(input("please enter any weekday : ")).lower().strip()
+        day = str(input("please enter any weekday or all for no filters :")).lower().strip()
 
     print('-'*40)
     return city, month, day.capitalize()
+
 
 
 
@@ -54,6 +55,9 @@ def load_data(city, month, day):
     Returns:
         df - Pandas DataFrame containing city data filtered by month and day
     """
+    city = city.lower().strip()
+    month = month.lower().strip()
+    day = day.lower().strip().capitalize()
     df = pd.read_csv(CITY_DATA[city])
     df["Start Time"] = pd.to_datetime(df["Start Time"])
     df["Month"] = df["Start Time"].dt.month
@@ -63,7 +67,7 @@ def load_data(city, month, day):
     if month.lower().strip() != 'all':
         # use the index of the months list to get the corresponding int
         months = ['january', 'february', 'march', 'april', 'may', 'june']
-        month = months.index(month)+1
+        month = months.index(month.lower().strip())+1
     
         # filter by month to create the new dataframe
         df = df[df['Month']==month]
@@ -71,7 +75,7 @@ def load_data(city, month, day):
     # filter by day of week if applicable
     if day.lower().strip() != 'all':
         # filter by day of week to create the new dataframe
-        df = df[df['day_of_week']==day.capitalize()]
+        df = df[df['day_of_week']==day.lower().strip().capitalize()]
 
     return df
 
@@ -97,6 +101,7 @@ def time_stats(df):
     print('-'*40)
 
 
+
 def station_stats(df):
     """Displays statistics on the most popular stations and trip."""
 
@@ -112,7 +117,7 @@ def station_stats(df):
 
 
     # display most frequent combination of start station and end station trip
-    print("the most frequent combination of start station and end station trip ({})".format((df["Start Station"]+" , "+df["End Station"]).mode()[0]))
+    print("the most frequent combination of start station and end station trip ({})".format((df["Start Station"]+" "+df["End Station"]).mode()[0]))
 
 
     print("\nThis took %s seconds." % (time.time() - start_time))
@@ -167,6 +172,7 @@ def main():
     while True:
         city, month, day = get_filters()
         df = load_data(city, month, day)
+        # print(df.head())
 
         time_stats(df)
         station_stats(df)
